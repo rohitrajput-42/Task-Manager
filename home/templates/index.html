@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+
+    <div class = "container-fluid" style = "background-color: #000;">
+        <div id = 'tabs' class = "container-fluid text-center" style = "max-width: 1280px;">
+          <ul class="nav nav-tabs">
+            <li class="nav-item" style = "width: 250px;">
+              <a class="nav-link active" aria-current="page" href="/">Todo's</a>
+            </li>
+            <li class="nav-item" style = "width: 250px;">
+              <a class="nav-link" href="{% url 'upcoming' %}">Upcoming  Tasks</a>
+            </li>
+          </ul>
+        </div>
+    </div>
+
+    <div class = "container text-center">
+        <h1 class = "display-3"> Hello <strong>{{user}}</strong>!!... Welcome </h1>
+    </div>
+
+    <div class = "container-fluid">
+        <div class = "row">
+            <div id = "task" class = "container col-lg-4 border  mt-4 mb-5">
+                <form method = "POST">
+                    {% csrf_token %}
+
+                    <p class = "m-4" style = "font-size: 40px;"> Add a new task </p>
+
+                    {{form|crispy}}
+
+                    <input type = "submit" class = "btn btn-md btn-outline-primary m-4" value = "Add Task">
+                </form>
+            </div>
+            
+            <div id = "task" class = "container col-lg-7 mt-4 mb-5 p-0">
+               
+                {% if todos|length == 0 %}
+                    <div class = "container text-center p-5">
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <h1 class = "alert alert-primary"> No Tasks!!!... </h1>
+                    </div>
+                {% else %}
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                        <tr>
+                            <th class = "text-center" scope="col">S.No.</th>
+                            <th class = "text-center" scope="col">Task</th>
+                            <th class = "text-center" scope="col">Status</th>
+                            <th class = "text-center" scope="col">Date Created</th>
+                            <th class = "text-center" scope="col">Delete</th>
+                            <th class = "text-center" scope="col">Change Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for todo in todos %}
+                            <tr>
+                                <th class = "text-center" scope="row">{{forloop.counter}}</th>
+                                <td class = "text-center">{{todo.title}}</td>
+                                <td class = "text-center">{{todo.status}}</td>
+                                <td class = "text-center">{{todo.date_created}}</td>
+                                <td class = "text-center"><a class = "m-5" href = 'delete_task/{{todo.id}}'> 🗑 </a></td>
+                                {% if todo.status == 'pending' %}
+                                <td class = "text-center"><a href = "change_status/{{todo.id}}/completed" title = "Mark as complete">✔️</a></td>
+                                {% else %}
+                                <td class = "text-center"><a href = "change_status/{{todo.id}}/pending" title = "Mark as pending">⏱️</a></td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        
+                        </tbody>
+                    </table>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class = "container text-center">
+        <h1 class = "display-3"> Hello User!!!... <br> Authenticate yourself first </h1>
+    </div>
+    {% endif %}
+
+
+{% endblock %}
